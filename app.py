@@ -4,14 +4,15 @@ import pandas as pd
 import joblib
 import firebase_admin
 from firebase_admin import credentials, firestore
+import json
 
 # Load model and scaler
 model = joblib.load("svr_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
-# Initialize Firebase
+# Initialize Firebase using secrets
 if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_config.json")  # Update with your JSON key file name
+    cred = credentials.Certificate(json.loads(st.secrets["firebase_key"]))
     firebase_admin.initialize_app(cred)
 db = firestore.client()
 
@@ -33,12 +34,12 @@ height_diff_map = {
 st.title("👨‍👩‍👧 Predict Child Height")
 
 with st.form("height_form"):
-    father_ft = st.number_input("Father's Height (feet)", min_value=4, max_value=8, value=5, step=1, format="%d")
-    father_in = st.number_input("Father's Height (inches)", min_value=0, max_value=11, value=8, step=1, format="%d")
-    mother_ft = st.number_input("Mother's Height (feet)", min_value=4, max_value=8, value=5, step=1, format="%d")
-    mother_in = st.number_input("Mother's Height (inches)", min_value=0, max_value=11, value=4, step=1, format="%d")
+    father_ft = st.number_input("Father's Height (feet)", min_value=4, max_value=8, value=5, step=1)
+    father_in = st.number_input("Father's Height (inches)", min_value=0, max_value=11, value=8, step=1)
+    mother_ft = st.number_input("Mother's Height (feet)", min_value=4, max_value=8, value=5, step=1)
+    mother_in = st.number_input("Mother's Height (inches)", min_value=0, max_value=11, value=4, step=1)
     gender = st.selectbox("Child Gender", ["Male", "Female"])
-    child_num = st.number_input("Child Number (in family)", min_value=1, max_value=15, value=1, step=1, format="%d")
+    child_num = st.number_input("Child Number (in family)", min_value=1, max_value=15, value=1)
 
     submitted = st.form_submit_button("Predict Height")
 
